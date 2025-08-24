@@ -16,24 +16,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up .NET
+      - name: Setup .NET 8
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
       - name: Install .NET 9 Preview
         run: |
-          curl -sSL https://dot.net/v1/dotnet-install.sh > dotnet-install.sh
-          chmod +x dotnet-install.sh
-          ./dotnet-install.sh --version 9.0.100-preview.1 --install-dir $DOTNET_ROOT
+          wget https://aka.ms/install-dotnet-preview -O install-dotnet-preview.sh
+          chmod +x install-dotnet-preview.sh
+          ./install-dotnet-preview.sh --channel 9.0-preview1
+
+      - name: Verify .NET Installation
+        run: dotnet --list-sdks
       - name: Restore dependencies
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build --configuration Release
 
-      - name: Run tests
-        run: dotnet test --no-build --verbosity normal
+      - name: Tests
+        run: dotnet test --configuration Release
 
   deploy:
     runs-on: ubuntu-latest
