@@ -1,11 +1,12 @@
-using System;
-using System.Threading.Tasks;
+using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Text;
-using System.Net.Http;
 using NotificationFunction.Models;
+using System;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace NotificationFunction.Functions
 {
@@ -22,11 +23,13 @@ namespace NotificationFunction.Functions
 
         [Function("NotificationProcessor")]
         public async Task Run(
-            [ServiceBusTrigger("notification-queue", Connection = "ServiceBusConnection")] string queueItem)
+            [ServiceBusTrigger("notification-queue", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage queueItem)
         {
             try
             {
-                var notification = JsonConvert.DeserializeObject<Notification>(queueItem);
+                if (queueItem is null) { _logger.LogWarning("Null message"); return; }
+                var body = queueItem.Body.ToString();
+                var notification = JsonConvert.DeserializeObject<Notification>(body);
                 _logger.LogInformation($"Processing notification: {notification.Message}");
 
                 // Process the notification (e.g., send an email, log to a database, etc.)

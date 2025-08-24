@@ -28,10 +28,7 @@ namespace Products.Api.Controllers
         public async Task<ActionResult<Product>> GetProductById(string id)
         {
             var product = await _cosmosDbService.GetProductByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
+            if (product is null) return NotFound();
             return Ok(product);
         }
 

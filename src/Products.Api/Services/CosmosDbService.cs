@@ -29,7 +29,7 @@ namespace Products.Api.Services
             return results;
         }
 
-        public async Task<Product> GetProductByIdAsync(string id)
+        public async Task<Product?> GetProductByIdAsync(string id)
         {
             try
             {
