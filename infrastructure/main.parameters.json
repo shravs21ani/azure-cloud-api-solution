@@ -1,0 +1,30 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "apiManagementName": {
+            "value": "cloud-api-apim"
+        },
+        "cosmosDbAccountName": {
+            "value": "cloud-api-cosmos"
+        },
+        "functionAppName": {
+            "value": "cloud-api-func"
+        },
+        "keyVaultName": {
+            "value": "cloud-api-kv"
+        },
+        "storageAccountName": {
+            "value": "cloudapistg"
+        },
+        "appInsightsName": {
+            "value": "cloud-api-insights"
+        },
+        "publisherEmail": {
+            "value": "admin@contoso.com"
+        },
+        "publisherName": {
+            "value": "Contoso API Team"
+        }
+    }
+}

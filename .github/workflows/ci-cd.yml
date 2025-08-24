@@ -14,45 +14,52 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: |
+            9.0.100-preview.1
+            8.0.x
 
       - name: Restore dependencies
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test --no-restore --verbosity normal
+        run: dotnet test --no-build --verbosity normal
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    if: github.ref == 'refs/heads/main'
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Azure CLI
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            az --version
-            az account show
+        uses: actions/checkout@v3
 
       - name: Login to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy infrastructure
-        run: |
-          az deployment group create --resource-group <your-resource-group> --template-file infrastructure/main.bicep --parameters <your-parameters>
+      - name: Deploy Infrastructure
+        uses: azure/arm-deploy@v1
+        with:
+          scope: resourcegroup
+          resourceGroupName: ${{ secrets.AZURE_RG }}
+          template: ./infrastructure/main.bicep
+          parameters: '@infrastructure/main.parameters.json'
 
+      - name: Publish .NET App
+        run: dotnet publish src/Products.Api/Products.Api.csproj -c Release -o ./publish
+            
+        
       - name: Deploy API
-        run: |
-          az webapp deploy --resource-group <your-resource-group> --name <your-app-name> --src-path ./src/Products.Api/bin/Release/net9.0/publish
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ secrets.WEBAPP_NAME }}
+          package: ./publish
