@@ -1,53 +1,77 @@
+using System.Text;
 using Azure.Messaging.ServiceBus;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NotificationFunction.Models;
-using System;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace NotificationFunction.Functions
+namespace NotificationFunction.Functions;
+
+public class NotificationProcessor
 {
-    public class NotificationProcessor
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<NotificationProcessor> _logger;
+
+    public NotificationProcessor(HttpClient httpClient, ILogger<NotificationProcessor> logger)
     {
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<NotificationProcessor> _logger;
+        _httpClient = httpClient;
+        _logger = logger;
+    }
 
-        public NotificationProcessor(HttpClient httpClient, ILogger<NotificationProcessor> logger)
+    [Function("NotificationProcessor")]
+    public async Task Run(
+        [ServiceBusTrigger("notification-queue", Connection = "ServiceBusConnection")]
+        ServiceBusReceivedMessage queueItem)
+    {
+        try
         {
-            _httpClient = httpClient;
-            _logger = logger;
-        }
+            if (queueItem is null)
+            {
+                _logger.LogWarning("Null message");
+                return;
+            }
 
-        [Function("NotificationProcessor")]
-        public async Task Run(
-            [ServiceBusTrigger("notification-queue", Connection = "ServiceBusConnection")] ServiceBusReceivedMessage queueItem)
-        {
+            // Safely read the message body
+            var body = Encoding.UTF8.GetString(queueItem.Body.ToArray());
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                _logger.LogWarning("Empty body");
+                return;
+            }
+
+            // Newtonsoft returns nullable; handle invalid JSON
+            Notification? notification;
             try
             {
-                if (queueItem is null) { _logger.LogWarning("Null message"); return; }
-                var body = queueItem.Body.ToString();
-                var notification = JsonConvert.DeserializeObject<Notification>(body);
-                _logger.LogInformation($"Processing notification: {notification.Message}");
-
-                // Process the notification (e.g., send an email, log to a database, etc.)
-                await ProcessNotification(notification);
+                notification = JsonConvert.DeserializeObject<Notification>(body);
             }
-            catch (Exception ex)
+            catch (JsonException jex)
             {
-                _logger.LogError($"Error processing notification: {ex.Message}");
-                throw; // Optionally rethrow to trigger DLQ
+                _logger.LogError(jex, "Invalid JSON payload: {Body}", body);
+                return;
             }
-        }
 
-        private async Task ProcessNotification(Notification notification)
-        {
-            // Example of sending a notification (e.g., HTTP request to another service)
-            var content = new StringContent(JsonConvert.SerializeObject(notification), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync("https://example.com/api/notifications", content);
-            response.EnsureSuccessStatusCode();
+            if (notification is null)
+            {
+                _logger.LogWarning("Deserialized notification is null. Body: {Body}", body);
+                return;
+            }
+
+            _logger.LogInformation("Processing notification: {Message}", notification.Message);
+            await ProcessNotification(notification);
         }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing notification");
+            throw; // let Functions retry / DLQ
+        }
+    }
+
+    private async Task ProcessNotification(Notification notification)
+    {
+        var content = new StringContent(JsonConvert.SerializeObject(notification), Encoding.UTF8, "application/json");
+        var response = await _httpClient.PostAsync("https://example.com/api/notifications", content);
+        response.EnsureSuccessStatusCode();
     }
 }
