@@ -1,0 +1,7 @@
+Sure, here's the content for the file: /CloudApiSolution/CloudApiSolution/global.json
+
+{
+  "sdk": {
+    "version": "6.0.100"
+  }
+}

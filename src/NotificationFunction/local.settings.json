@@ -1,0 +1,10 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "ServiceBusConnection": "<Your-Service-Bus-Connection-String>",
+    "CosmosDBConnectionString": "<Your-Cosmos-DB-Connection-String>",
+    "KeyVaultUri": "<Your-Key-Vault-URI>"
+  }
+}

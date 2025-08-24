@@ -1,0 +1,5 @@
+// Kusto Query to monitor application failures
+requests
+| where success == "False"
+| summarize count() by operation_Name, bin(timestamp, 1h)
+| order by count_ desc

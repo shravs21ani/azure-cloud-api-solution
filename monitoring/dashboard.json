@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "widgets": [
+    {
+      "type": "metric",
+      "name": "API Request Count",
+      "resourceId": "/subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.ApiManagement/service/{api-management-name}/metrics",
+      "metricName": "Total Requests",
+      "aggregation": "Total",
+      "timeAggregation": "Total",
+      "timeRange": "PT1H",
+      "chartType": "line"
+    },
+    {
+      "type": "metric",
+      "name": "API Latency",
+      "resourceId": "/subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.ApiManagement/service/{api-management-name}/metrics",
+      "metricName": "Average Response Time",
+      "aggregation": "Average",
+      "timeAggregation": "Average",
+      "timeRange": "PT1H",
+      "chartType": "line"
+    },
+    {
+      "type": "metric",
+      "name": "Failed Requests",
+      "resourceId": "/subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.ApiManagement/service/{api-management-name}/metrics",
+      "metricName": "Failed Requests",
+      "aggregation": "Total",
+      "timeAggregation": "Total",
+      "timeRange": "PT1H",
+      "chartType": "bar"
+    },
+    {
+      "type": "logQuery",
+      "name": "Error Logs",
+      "query": "AzureDiagnostics | where ResourceType == \"APIManagement\" and Level == \"Error\" | summarize count() by bin(TimeGenerated, 1h)",
+      "timeRange": "PT1H",
+      "chartType": "table"
+    }
+  ]
+}

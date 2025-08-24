@@ -1,0 +1,21 @@
+<policies>
+    <inbound>
+        <base />
+        <set-header name="Authorization" exists-action="override">
+            <value>Bearer {token}</value>
+        </set-header>
+        <validate-jwt header-name="Authorization" failed-validation-httpcode="401" 
+                      issuer-uri="https://your-issuer-url" 
+                      audience="your-audience" 
+                      token-type="Bearer" />
+    </inbound>
+    <backend>
+        <base />
+    </backend>
+    <outbound>
+        <base />
+    </outbound>
+    <on-error>
+        <base />
+    </on-error>
+</policies>
