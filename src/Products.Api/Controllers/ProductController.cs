@@ -45,12 +45,12 @@ namespace Products.Api.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(string id, Product product)
         {
-            if (id != product.Id)
+            if (id != product.Id.ToString())
             {
                 return BadRequest();
             }
 
-            await _cosmosDbService.UpdateProductAsync(product);
+            await _cosmosDbService.UpdateProductAsync(id, product);
             return NoContent();
         }
 

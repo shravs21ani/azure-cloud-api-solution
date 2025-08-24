@@ -1,0 +1,29 @@
+# IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.rsuser
+*.sln.docstates
+
+# Build
+[Bb]in/
+[Oo]bj/
+**/[Bb]in/
+**/[Oo]bj/
+*.pdb
+*.cache
+
+# NuGet (optional)
+packages/
+*.nupkg
+
+# Logs
+*.log
+
+# Azure Functions local settings (do not commit secrets)
+**/local.settings.json
+
+# Rider/Resharper
+_ReSharper.Caches/

@@ -43,7 +43,7 @@ namespace Products.Api.Services
 
         public async Task<Product> CreateProductAsync(Product product)
         {
-            var response = await _container.CreateItemAsync(product, new PartitionKey(product.Id));
+            var response = await _container.CreateItemAsync(product, new PartitionKey(product.Id.ToString()));
             return response.Resource;
         }
 

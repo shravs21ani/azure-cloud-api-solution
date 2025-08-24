@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
 using System.Net.Http;
+using NotificationFunction.Models;
 
 namespace NotificationFunction.Functions
 {

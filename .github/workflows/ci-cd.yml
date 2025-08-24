@@ -16,22 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup .NET 8
+      - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '8.0.x'
-      - name: Install .NET 9 Preview
-        run: |
-          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
-          chmod +x dotnet-install.sh
-          sudo ./dotnet-install.sh --version 9.0.100-preview.1 --install-dir /usr/share/dotnet
+          dotnet-version: |
+            8.0.x
+            7.0.x
 
-      - name: Add dotnet to PATH
-        run: |
-          echo "/usr/share/dotnet" >> $GITHUB_PATH
-
-      - name: Verify .NET Installation
-        run: dotnet --list-sdks
       - name: Restore dependencies
         run: dotnet restore
 
@@ -50,6 +41,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+
       - name: Login to Azure
         uses: azure/login@v1
         with:
@@ -60,13 +56,12 @@ jobs:
         with:
           scope: resourcegroup
           resourceGroupName: ${{ secrets.AZURE_RG }}
-          template: ./infrastructure/main.bicep
-          parameters: '@infrastructure/main.parameters.json'
+          template: infrastructure/main.bicep
+          parameters: infrastructure/main.parameters.json
 
       - name: Publish .NET App
         run: dotnet publish src/Products.Api/Products.Api.csproj -c Release -o ./publish
-            
-        
+
       - name: Deploy API
         uses: azure/webapps-deploy@v2
         with:
