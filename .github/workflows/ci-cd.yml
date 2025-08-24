@@ -20,12 +20,15 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
-
       - name: Install .NET 9 Preview
         run: |
-          wget https://aka.ms/install-dotnet-preview -O install-dotnet-preview.sh
-          chmod +x install-dotnet-preview.sh
-          ./install-dotnet-preview.sh --channel 9.0-preview1
+          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+          chmod +x dotnet-install.sh
+          sudo ./dotnet-install.sh --version 9.0.100-preview.1 --install-dir /usr/share/dotnet
+
+      - name: Add dotnet to PATH
+        run: |
+          echo "/usr/share/dotnet" >> $GITHUB_PATH
 
       - name: Verify .NET Installation
         run: dotnet --list-sdks
@@ -35,7 +38,7 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
 
-      - name: Tests
+      - name: Test
         run: dotnet test --configuration Release
 
   deploy:
