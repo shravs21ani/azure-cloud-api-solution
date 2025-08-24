@@ -81,7 +81,7 @@ CloudApiSolution/
 
 1. **Clone the Repository**
 ```bash
-git clone https://github.com/yourusername/cloud-api-solution.git
+git clone https://github.com/shravs21ani/cloud-api-solution.git
 cd cloud-api-solution
 ```
 
